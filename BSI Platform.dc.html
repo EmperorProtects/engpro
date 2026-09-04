@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<title>Bek Stroy Invest — ИИ для выпуска цифровой модели и проектной документации</title>
+<meta name="description" content="ТОО «Bek Stroy Invest»: применение ИИ для выпуска цифровой модели и проектной документации, экспертиза проекта с ИИ, цифровые двойники с IoT, удалённый контроль зданий.">
+<template id="__bundler_thumbnail">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#416180"/><g fill="none" stroke="#f2f2f3" stroke-width="3"><rect x="60" y="60" width="80" height="80"/><path d="M60 60 100 30 140 60"/></g><text x="100" y="115" fill="#f2f2f3" font-family="sans-serif" font-size="26" font-weight="700" text-anchor="middle">BSI</text></svg>
+</template>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<link rel="stylesheet" href="_ds/industry-a458f529-fc3f-4d39-8047-7968176c36b5/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script src="_ds/industry-a458f529-fc3f-4d39-8047-7968176c36b5/_ds_bundle.js"></script>
+
+<style>
+  html, body { background: #f2f2f3; }
+  a { color: #416180; text-decoration: none; }
+  a:hover { color: #597ea3; text-decoration: underline; }
+  @keyframes bsiflow { 0% { transform: translateX(0); opacity: .15 } 50% { opacity: 1 } 100% { transform: translateX(46px); opacity: .15 } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); --bsi-accent: var(--color-accent)">
+ 
+  <div class="nav" style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; min-height: 66px; padding: 8px 28px; border-bottom: 1px solid var(--color-divider); position: sticky; top: 0; background: var(--color-bg); z-index: 20">
+    <div style="display: flex; align-items: baseline; gap: 8px; cursor: pointer" onClick="{{ goHome }}">
+      <span style="font-family: var(--font-heading); font-size: 25px; letter-spacing: .04em">BSI</span>
+      <span class="text-muted" style="font-size: 10px; letter-spacing: .16em; text-transform: uppercase">Engineering&nbsp;AI</span>
+    </div>
+    <nav style="display: flex; align-items: stretch; flex-wrap: wrap; gap: 2px; margin-left: 4px; min-width: 0">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="5">
+        <a href="{{ item.href }}" style="position: relative; display: block; padding: 8px 12px; text-decoration: none; font-family: var(--font-heading); font-size: 15px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text); cursor: pointer" style-hover="color: var(--color-accent-700)">
+          <span class="text-muted" style="font-size: 10px; margin-right: 6px; font-family: var(--font-body); letter-spacing: .08em">{{ item.num }}</span>{{ item.label }}
+          <sc-if value="{{ item.active }}" hint-placeholder-val="{{ true }}">
+            <i style="position: absolute; left: 10px; right: 10px; bottom: 0; height: 2px; background: var(--color-accent)"></i>
+          </sc-if>
+        </a>
+      </sc-for>
+    </nav>
+    <div style="flex: 1 1 0; min-width: 0"></div>
+    <button type="button" onClick="{{ toggleLang }}" class="btn btn-ghost" style="font-size: 12px; letter-spacing: .12em">{{ otherLang }}</button>
+    <a href="tel:+77779576163" class="text-muted" style="font-size: 12px; letter-spacing: .06em">+7 (777) 957-61-63</a>
+    <button type="button" onClick="{{ goContacts }}" class="btn btn-primary blueprint" style="letter-spacing: .1em">{{ t.ctaShort }}<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></button>
+  </div>
+
+  <button 
+    onClick="{{ toggleChat }}" 
+    class="fixed right-4 bottom-4 w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center text-xl z-50 hover:bg-blue-700 transition cursor-pointer"
+  >
+    💬
+  </button>
+
+  <sc-if value = "{{ chatOpen }}">
+    <aside id="chat-window" class="fixed right-4 bottom-20 w-96 h-[550px] bg-white border shadow-2xl rounded-2xl flex flex-col z-50 ">
+      <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+        <span class="font-semibold text-gray-800">AI Assistant</span>
+        <button onClick="{{ toggleChat }}" class="text-gray-400 hover:text-black">✕</button>
+      </div>
+
+      <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm flex flex-col"></div>
+      <sc-for list="{{ chatMessages }}" as="m">
+          <div class="{{ m.style}} rounded-xl p-3 max-w-[85%]"> {{m.text}} </div>
+      </sc-for>
+      <div class="p-4 border-t bg-white flex gap-2">
+        <input 
+          id="chat-input" 
+          name = "message"
+          class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          type="text" 
+          placeholder="Сообщение..." 
+          value="{{ userMessage }}"
+          onChange="{{handleUserField}}"
+          >
+          <!-- <input id="bsi-name" name="name" class="input" type="text" autocomplete="name" value="{{ fName }}" onChange="{{ onField }}" style="width: 100%"> -->
+
+        <button onClick="{{ sendMessage }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
+          ➤
+        </button>
+      </div>
+    </aside>
+  </sc-if>
+
+  <!-- <sc-if value="{{ chatOpen }}">
+  
+  </sc-if> -->
+  
+
+  <!-- ═══ HOME ═══ -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <main>
+     
+    <section style="max-width: 1240px; margin: 0 auto; padding: 68px 28px 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 56px; align-items: end">
+      <div>
+        <div class="text-muted" style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 26px">◭ {{ t.heroSheet }}</div>
+        <h1 style="font-size: clamp(44px, 4.5vw, 76px); line-height: .96; letter-spacing: -.02em; margin: 0 0 18px; text-transform: uppercase; max-width: 16ch; text-wrap: balance">{{ t.heroTitle }}</h1>
+        <p style="font-family: var(--font-heading); font-size: clamp(19px, 1.8vw, 24px); letter-spacing: .02em; text-transform: uppercase; color: var(--color-accent-700); max-width: 40ch; text-wrap: pretty; margin: 0 0 30px">{{ t.heroLead }}</p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap">
+          <button type="button" onClick="{{ goProduct }}" class="btn btn-primary blueprint" style="letter-spacing: .1em; padding: 12px 22px">{{ t.heroBtn1 }}<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></button>
+          <a href="https://wa.me/77779576163" target="_blank" class="btn btn-secondary" style="letter-spacing: .1em; padding: 12px 22px">{{ t.heroBtn2 }}</a>
+        </div>
+      </div>
+      <figure class="blueprint" style="padding: 0; position: relative">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 10px 14px; border-bottom: 1px solid var(--color-divider)">
+          <span class="text-muted" style="font-size: 10px; letter-spacing: .16em; text-transform: uppercase">◭ {{ t.modelLabel }}</span>
+          <span class="text-muted" style="font-size: 10px; letter-spacing: .16em; text-transform: uppercase">3D · 01 / 02</span>
+        </div>
+        <x-import component-from-global-scope="bsi-model" from="./bsi-model.js" style="display: block; width: 100%; height: 360px; --model-line: var(--color-accent-700); --model-face: var(--color-accent)" hint-size="100%,360px"></x-import>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 9px 14px; border-top: 1px solid var(--color-divider)">
+          <span class="text-muted" style="font-size: 10px; letter-spacing: .16em; text-transform: uppercase">{{ t.modelHint }}</span>
+          <span class="text-muted" style="font-size: 10px; letter-spacing: .16em">A B 1 2</span>
+        </div>
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      </figure>
+    </section>
+
+    <section style="border-top: 1px solid var(--color-divider); border-bottom: 1px solid var(--color-divider)">
+      <div style="max-width: 1240px; margin: 0 auto; padding: 0 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))">
+        <sc-for list="{{ facts }}" as="f" hint-placeholder-count="4">
+          <div style="padding: 22px 20px 24px; border-left: 1px solid var(--color-divider)">
+            <div style="font-family: var(--font-heading); font-size: 27px; line-height: 1">{{ f.big }}</div>
+            <div class="text-muted" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; margin-top: 6px">{{ f.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width: 1240px; margin: 0 auto; padding: 64px 28px 0">
+      <div class="text-muted" style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 12px">◭ {{ t.dirSheet }}</div>
+      <h2 style="font-size: clamp(30px, 3.2vw, 40px); text-transform: uppercase; margin-bottom: 26px">{{ t.dirTitle }}</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px">
+        <sc-for list="{{ directions }}" as="d" hint-placeholder-count="4">
+          <div class="card blueprint" style="padding: 22px 20px 26px; background: none">
+            <div style="font-family: var(--font-heading); font-size: 13px; letter-spacing: .1em; color: var(--color-accent-700)">{{ d.n }}</div>
+            <p style="font-size: 17px; margin: 12px 0 0; text-wrap: pretty">{{ d.v }}</p>
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width: 1240px; margin: 0 auto; padding: 64px 28px 12px">
+      <div class="text-muted" style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 12px">◭ {{ t.pipeSheet }}</div>
+      <h2 style="font-size: clamp(30px, 3.2vw, 40px); text-transform: uppercase; margin-bottom: 8px">{{ t.pipeTitle }}</h2>
+      <p class="text-muted" style="max-width: 62ch">{{ t.pipeLead }}</p>
+    </section>
+    <section style="max-width: 1240px; margin: 0 auto; padding: 26px 28px 12px; overflow: hidden">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 34px">
+        <sc-for list="{{ stages }}" as="p" hint-placeholder-count="3">
+          <div class="card blueprint" style="padding: 22px 20px 24px; background: none; position: relative">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
+              <span style="font-family: var(--font-heading); font-size: 13px; letter-spacing: .1em; color: var(--color-accent-700)">{{ p.num }}</span>
+              <span class="tag tag-outline" style="font-size: 10px; letter-spacing: .12em">{{ p.tag }}</span>
+            </div>
+            <h4 style="text-transform: uppercase; margin: 10px 0 8px; font-size: 22px">{{ p.title }}</h4>
+            <p class="text-muted" style="font-size: 13px; margin: 0">{{ p.desc }}</p>
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <sc-if value="{{ p.arrow }}" hint-placeholder-val="{{ true }}">
+              <i style="position: absolute; top: 50%; right: -30px; width: 26px; height: 1px; background: var(--color-accent); animation: bsiflow 2.6s linear infinite"></i>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width: 1240px; margin: 0 auto; padding: 44px 28px 70px; display: grid; gap: 26px">
+      <sc-for list="{{ stagePanels }}" as="s" hint-placeholder-count="3">
+        <div class="blueprint" style="padding: 26px 28px 30px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--color-divider)">
+            <h3 style="text-transform: uppercase; margin: 0; font-size: 24px"><span style="color: var(--color-accent-700); font-size: 15px; margin-right: 10px">{{ s.num }}</span>{{ s.title }}</h3>
+            <span class="text-muted" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase">{{ s.note }}</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; padding-top: 22px">
+            <sc-for list="{{ s.cols }}" as="c" hint-placeholder-count="2">
+              <div>
+                <div class="text-muted" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 4px">{{ c.role }}</div>
+                <h4 style="text-transform: uppercase; margin: 0 0 6px; font-size: 19px">{{ c.title }}</h4>
+                <p class="text-muted" style="font-size: 13px; margin: 0 0 14px">{{ c.lead }}</p>
+                <sc-for list="{{ c.items }}" as="i" hint-placeholder-count="5">
+                  <div style="display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 9px 0; border-top: 1px solid var(--color-divider); font-size: 14px">
+                    <span class="text-muted" style="font-size: 11px; letter-spacing: .1em">{{ i.n }}</span>
+                    <span>{{ i.v }}</span>
+                  </div>
+                </sc-for>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px">
+                  <sc-for list="{{ c.codes }}" as="k" hint-placeholder-count="0">
+                    <span class="tag tag-accent" style="font-size: 11px; letter-spacing: .1em">{{ k }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="background: var(--color-accent-900); color: #f2f2f3">
+      <div style="max-width: 1240px; margin: 0 auto; padding: 70px 28px">
+        <div class="text-muted" style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 12px; color: var(--color-accent-300)">◭ {{ t.smartSheet }}</div>
+        <h2 style="font-size: clamp(30px, 3.2vw, 40px); text-transform: uppercase; color: #f2f2f3; max-width: 22ch">{{ t.smartTitle }}</h2>
+        <p style="max-width: 60ch; color: var(--color-accent-200); margin-bottom: 40px">{{ t.smartLead }}</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px">
+          <sc-for list="{{ smart }}" as="s" hint-placeholder-count="3">
+            <div class="blueprint" style="padding: 24px 22px 26px; border-color: color-mix(in srgb, #f2f2f3 30%, transparent); color: #f2f2f3">
+              <div style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-accent-300)">{{ s.num }}</div>
+              <h4 style="text-transform: uppercase; margin: 10px 0 10px; font-size: 21px; color: #f2f2f3">{{ s.title }}</h4>
+              <p style="font-size: 14px; margin: 0; color: var(--color-accent-200)">{{ s.desc }}</p>
+              <i class="corner tl" style="color: var(--color-accent-300)"></i><i class="corner tr" style="color: var(--color-accent-300)"></i><i class="corner bl" style="color: var(--color-accent-300)"></i><i class="corner br" style="color: var(--color-accent-300)"></i>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section style="max-width: 1240px; margin: 0 auto; padding: 76px 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 56px; align-items: center">
+      <div>
+        <h2 style="font-size: clamp(30px, 3.2vw, 40px); text-transform: uppercase; max-width: 20ch">{{ t.pilotTitle }}</h2>
+        <p style="max-width: 48ch; text-wrap: pretty">{{ t.pilotLead }}</p>
+        <div style="display: flex; gap: 12px; margin-top: 22px">
+          <a href="https://wa.me/77779576163" target="_blank" class="btn btn-primary blueprint" style="letter-spacing: .1em; padding: 12px 22px">{{ t.pilotBtn }}<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></a>
+          <button type="button" onClick="{{ goCompany }}" class="btn btn-ghost" style="letter-spacing: .1em">{{ t.pilotBtn2 }}</button>
+        </div>
+      </div>
+      <div class="blueprint" style="padding: 26px 28px">
+        <sc-for list="{{ credentials }}" as="c" hint-placeholder-count="4">
+          <div style="display: flex; justify-content: space-between; gap: 20px; padding: 11px 0; border-bottom: 1px solid var(--color-divider); font-size: 14px">
+            <span class="text-muted" style="font-size: 11px; letter-spacing: .12em; text-transform: uppercase">{{ c.k }}</span>
+            <span style="text-align: right">{{ c.v }}</span>
+          </div>
+        </sc-for>
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      </div>
+    </section>
+  </main>
+  </sc-if>
+
+  <!-- ═══ PRODUCT ═══ -->
+  <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width: 1240px; margin: 0 auto; padding: 62px 28px 80px">
+    <div class="text-muted" style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 16px">◭ {{ t.prodSheet }}</div>
+    <h1 style="font-size: clamp(38px, 4.4vw, 58px); text-transform: uppercase; max-width: 24ch; line-height: 1; margin-bottom: 10px">{{ t.prodTitle }}</h1>
+    <h2 style="font-family: var(--font-heading); font-size: clamp(20px, 2vw, 26px); text-transform: uppercase; letter-spacing: .02em; color: var(--color-accent-700); margin: 0 0 18px; max-width: 30ch">{{ t.prodSub }}</h2>
+    <p style="font-size: 17px; max-width: 58ch; margin-bottom: 22px">{{ t.prodLead }}</p>
+    <ol style="list-style: none; counter-reset: pp; margin: 0 0 26px; padding: 0; max-width: 92ch; display: grid; gap: 0">
+      <sc-for list="{{ prodPoints }}" as="p" hint-placeholder-count="3">
+        <li style="counter-increment: pp; display: grid; grid-template-columns: 40px 170px 1fr; gap: 16px; align-items: baseline; padding: 15px 0; border-top: 1px solid var(--color-divider)">
+          <span class="text-muted" style="font-family: var(--font-heading); font-size: 14px; letter-spacing: .1em">{{ p.n }}</span>
+          <span style="font-family: var(--font-heading); font-size: 16px; letter-spacing: .08em; text-transform: uppercase; color: var(--color-accent-700)">{{ p.k }}</span>
+          <span style="font-size: 15px; text-wrap: pretty">{{ p.v }}</span>
+        </li>
+      </sc-for>
+    </ol>
+    <p class="text-muted" style="font-size: 14px; letter-spacing: .04em; max-width: 58ch; margin-bottom: 54px">{{ t.prodHorizon }}</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 48px; align-items: start">
+      <div>
+        <h3 style="text-transform: uppercase; margin-bottom: 18px">{{ t.prodStagesTitle }}</h3>
+        <sc-for list="{{ stages }}" as="p" hint-placeholder-count="3">
+          <div style="display: grid; grid-template-columns: 46px 1fr; gap: 14px; padding: 16px 0; border-top: 1px solid var(--color-divider)">
+            <div style="font-family: var(--font-heading); font-size: 17px; color: var(--color-accent-700)">{{ p.num }}</div>
+            <div>
+              <h4 style="text-transform: uppercase; margin: 0 0 4px">{{ p.title }}</h4>
+              <p class="text-muted" style="font-size: 14px; margin: 0">{{ p.long }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div>
+        <h3 style="text-transform: uppercase; margin-bottom: 18px">{{ t.prodStackTitle }}</h3>
+        <table class="table" style="width: 100%">
+          <tbody>
+            <sc-for list="{{ stack }}" as="s" hint-placeholder-count="5">
+              <tr>
+                <td style="font-size: 11px; letter-spacing: .12em; text-transform: uppercase; width: 40%; vertical-align: top">{{ s.k }}</td>
+                <td style="font-size: 14px">{{ s.v }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <h3 style="text-transform: uppercase; margin: 40px 0 18px">{{ t.prodOutTitle }}</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+          <sc-for list="{{ outputs }}" as="o" hint-placeholder-count="6">
+            <div class="blueprint" style="padding: 12px 14px; font-size: 13px; letter-spacing: .04em">{{ o }}<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <!-- ═══ SERVICES ═══ -->
+  <sc-if value="{{ isServices }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width: 1240px; margin: 0 auto; padding: 62px 28px 80px">
+   <div class="text-muted" style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 16px">◭ {{ t.servSheet }}</div>
+    <h1 style="font-size: clamp(38px, 4.4vw, 58px); text-transform: uppercase; line-height: 1">{{ t.servTitle }}</h1>
+    <p style="max-width: 56ch; margin-bottom: 50px">{{ t.servLead }}</p> 
+    <sc-for list="{{ services }}" as="s">
+        <div class="card blueprint accordion-item" style="background: white; margin-bottom: 15px;">
+          <div class="card-kicker" style="color: var(--color-accent-700)">{{ s.num }}</div>
+          <h4 class="card-title accordion-header" id="flush-heading{{s.flush}}" style="text-transform: uppercase; margin: 6px 0 8px">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse{{s.flush}}" aria-expanded="false" aria-controls="flush-collapse{{s.flush}}" style="font-size:2rem">
+              {{ s.title }}
+          </button>
+          </h4>
+          <div class="card-body text-muted accordion-collapse collapse " id="flush-collapse{{s.flush}}" style="font-size: 20px; margin: 0;">
+            {{ s.desc }}
+          </div>
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        </div>
+      </sc-for>
+  </main>
+  </sc-if>
+
+  <!-- ═══ COMPANY ═══ -->
+  <sc-if value="{{ isCompany }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width: 1240px; margin: 0 auto; padding: 62px 28px 80px">
+    <div class="text-muted" style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 16px">◭ {{ t.compSheet }}</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 56px; align-items: start">
+      <div>
+        <h1 style="font-size: clamp(38px, 4.4vw, 58px); text-transform: uppercase; line-height: 1; max-width: 20ch">{{ t.compTitle }}</h1>
+        <p style="font-size: 17px; max-width: 52ch">{{ t.compP1 }}</p>
+        <p style="max-width: 52ch">{{ t.compP2 }}</p>
+      </div>
+      <div class="blueprint" style="padding: 26px 28px">
+        <sc-for list="{{ credentials }}" as="c" hint-placeholder-count="4">
+          <div style="display: flex; justify-content: space-between; gap: 20px; padding: 11px 0; border-bottom: 1px solid var(--color-divider); font-size: 14px">
+            <span class="text-muted" style="font-size: 11px; letter-spacing: .12em; text-transform: uppercase">{{ c.k }}</span>
+            <span style="text-align: right">{{ c.v }}</span>
+          </div>
+        </sc-for>
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      </div>
+    </div>
+
+    <h3 style="text-transform: uppercase; margin: 64px 0 22px">{{ t.compWorkTitle }}</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 30px">
+      <figure>
+        <div class="blueprint duotone">
+          <img src="https://engpro.kz/images/portfolio/zavod-metallokonstruktsiy.jpg" alt="" style="width: 100%; height: 170px; object-fit: cover; filter: grayscale(1) contrast(1.05)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        </div>
+        <figcaption style="margin-top: 12px">
+          <span class="text-muted" style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase">{{ w0.kind }}</span>
+          <div style="font-family: var(--font-heading); font-size: 18px; text-transform: uppercase; color: var(--color-text)">{{ w0.title }}</div>
+        </figcaption>
+      </figure>
+      <figure>
+        <div class="blueprint duotone">
+          <img src="https://engpro.kz/images/portfolio/farmatsevticheskaya-fabrika.jpg" alt="" style="width: 100%; height: 170px; object-fit: cover; filter: grayscale(1) contrast(1.05)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        </div>
+        <figcaption style="margin-top: 12px">
+          <span class="text-muted" style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase">{{ w1.kind }}</span>
+          <div style="font-family: var(--font-heading); font-size: 18px; text-transform: uppercase; color: var(--color-text)">{{ w1.title }}</div>
+        </figcaption>
+      </figure>
+      <figure>
+        <div class="blueprint duotone">
+          <img src="https://engpro.kz/images/portfolio/fabrika-utilizatsii-otkhodov.jpg" alt="" style="width: 100%; height: 170px; object-fit: cover; filter: grayscale(1) contrast(1.05)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        </div>
+        <figcaption style="margin-top: 12px">
+          <span class="text-muted" style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase">{{ w2.kind }}</span>
+          <div style="font-family: var(--font-heading); font-size: 18px; text-transform: uppercase; color: var(--color-text)">{{ w2.title }}</div>
+        </figcaption>
+      </figure>
+      <figure>
+        <div class="blueprint duotone">
+          <img src="https://engpro.kz/images/portfolio/snos-zhilykh-domov-almaty.jpg" alt="" style="width: 100%; height: 170px; object-fit: cover; filter: grayscale(1) contrast(1.05)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        </div>
+        <figcaption style="margin-top: 12px">
+          <span class="text-muted" style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase">{{ w3.kind }}</span>
+          <div style="font-family: var(--font-heading); font-size: 18px; text-transform: uppercase; color: var(--color-text)">{{ w3.title }}</div>
+        </figcaption>
+      </figure>
+    </div>
+
+    <h3 style="text-transform: uppercase; margin: 64px 0 22px">{{ t.compPartnersTitle }}</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 20px">
+      <sc-for list="{{ partners }}" as="p" hint-placeholder-count="5">
+        <div class="blueprint" style="padding: 14px 16px; font-size: 13px; min-height: 66px; display: flex; align-items: center">{{ p }}<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></div>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <!-- ═══ CONTACTS ═══ -->
+  <sc-if value="{{ isContacts }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width: 1240px; margin: 0 auto; padding: 62px 28px 80px">
+    <div class="text-muted" style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 16px">◭ {{ t.contSheet }}</div>
+    <h1 style="font-size: clamp(38px, 4.4vw, 58px); text-transform: uppercase; line-height: 1; max-width: 22ch">{{ t.contTitle }}</h1>
+    <p style="max-width: 52ch; margin-bottom: 50px">{{ t.contLead }}</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 56px; align-items: start">
+      <div class="blueprint" style="padding: 28px 30px">
+        <sc-if value="{{ formSent }}">
+          <div style="display: grid; gap: 14px; padding: 8px 0 4px">
+            <div class="text-muted" style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase">◭ {{ t.formOkKicker }}</div>
+            <h3 style="text-transform: uppercase; margin: 0; font-size: 26px">{{ t.formOkTitle }}</h3>
+            <p class="text-muted" style="margin: 0; font-size: 14px">{{ t.formOkLead }}</p>
+            <button type="button" onClick="{{ formReset }}" class="btn btn-ghost" style="letter-spacing: .1em; justify-self: start">{{ t.formAgain }}</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ formOpen }}" hint-placeholder-val="{{ true }}">
+          <form onSubmit="{{ formSubmit }}" novalidate="novalidate">
+            <div class="field" style="margin-bottom: 16px">
+              <label for="bsi-name" style="font-size: 11px; letter-spacing: .12em; text-transform: uppercase">{{ t.formName }}</label>
+              <input id="bsi-name" name="name" class="input" type="text" autocomplete="name" value="{{ fName }}" onChange="{{ onField }}" style="width: 100%">
+            </div>
+            <div class="field" style="margin-bottom: 16px">
+              <label for="bsi-contact" style="font-size: 11px; letter-spacing: .12em; text-transform: uppercase">{{ t.formContact }}</label>
+              <input id="bsi-contact" name="contact" class="input" type="text" autocomplete="tel" value="{{ fContact }}" onChange="{{ onField }}" style="width: 100%">
+            </div>
+            <div class="field" style="margin-bottom: 20px">
+              <label for="bsi-task" style="font-size: 11px; letter-spacing: .12em; text-transform: uppercase">{{ t.formTask }}</label>
+              <textarea id="bsi-task" name="task" class="input" rows="4" value="{{ fTask }}" onChange="{{ onField }}" style="width: 100%; resize: vertical"></textarea>
+            </div>
+            <sc-if value="{{ formError }}">
+              <p style="margin: 0 0 14px; font-size: 13px; color: var(--color-accent-900)">{{ formError }}</p>
+            </sc-if>
+            <button type="submit" class="btn btn-primary btn-block blueprint" style="letter-spacing: .1em">{{ t.formSend }}<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></button>
+            <p class="text-muted" style="margin: 12px 0 0; font-size: 11px; letter-spacing: .06em">{{ t.formNote }}</p>
+          </form>
+        </sc-if>
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      </div>
+      <div>
+        <sc-for list="{{ contactRows }}" as="c" hint-placeholder-count="5">
+          <div style="padding: 15px 0; border-bottom: 1px solid var(--color-divider)">
+            <div class="text-muted" style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 3px">{{ c.k }}</div>
+            <div style="font-size: 17px; font-family: var(--font-heading)">{{ c.v }}</div>
+          </div>
+        </sc-for>
+        <div style="display: flex; gap: 12px; margin-top: 26px">
+          <a href="https://wa.me/77779576163" target="_blank" class="btn btn-secondary" style="letter-spacing: .1em">WHATSAPP</a>
+          <a href="mailto:engpro.kz@gmail.com" class="btn btn-ghost" style="letter-spacing: .1em">EMAIL</a>
+        </div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <footer style="border-top: 1px solid var(--color-divider); margin-top: 0">
+    <div style="max-width: 1240px; margin: 0 auto; padding: 34px 28px; display: flex; justify-content: space-between; gap: 28px; flex-wrap: wrap; align-items: baseline">
+      <div class="text-muted" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase">2026 © Bek Stroy Invest · Astana · engpro.kz</div>
+      <nav style="display: flex; flex-wrap: wrap; gap: 18px">
+        <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="5">
+          <a href="{{ item.href }}" class="text-muted" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase">{{ item.label }}</a>
+        </sc-for>
+      </nav>
+      <div class="text-muted" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase">{{ t.footerNote }}</div>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultLang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ru&quot;,&quot;en&quot;],&quot;default&quot;:&quot;ru&quot;,&quot;tsType&quot;:&quot;'ru' | 'en'&quot;,&quot;section&quot;:&quot;Content&quot;},&quot;showFacts&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Content&quot;}}">
+const T = {
+  ru: {
+    ctaShort: "ПИЛОТ",
+    nav: ["Главная", "Продукт", "Услуги", "Компания", "Контакты"],
+    heroSheet: "Лист 01 / платформа",
+    heroTitle: "Интеллектуально-Цифровая модель",
+    heroLead: "Интеллектуальная Платформа - Bestech Проектирование - строительство- эксплуатация.",
+    modelLabel: "Аксонометрия · кормозавод",
+    modelHint: "Прокрутка — вращение · перетаскивание — обзор",
+    heroBtn1: "Как это работает →",
+    heroBtn2: "Обсудить пилот",
+    dirSheet: "Направления",
+    dirTitle: "ТОО «Bek Stroy Invest»",
+    directions: [
+      "Применение ИИ для выпуска цифровой модели и проектной документации",
+      "Экспертиза проекта с использованием ИИ",
+      "Разработка цифровых двойников с подключением IoT на строительных площадках",
+      "Удаленный контроль за состоянием зданий на стадии эксплуатации"
+    ],
+    pipeSheet: "Схема / стадии",
+    pipeTitle: "Три стадии жизни объекта",
+    pipeLead: "Проектирование — цифровая модель проекта. Строительство — приборный контроль её параметров и цифровой двойник по измеренным данным. Эксплуатация — система контроля, в которой отражается любое изменение.",
+    smartSheet: "Умное строительство",
+    smartTitle: "Модель проекта, двойник, система контроля",
+    smartLead: "Три состояния одного объекта. Проектные параметры задаются в модели, фактические измеряются приборами на площадке, изменения в эксплуатации отражаются в системе контроля — расхождение видно сразу, а не в отчёте через месяц.",
+    pilotTitle: "Пилот на реальном объекте",
+    pilotLead: "Мы проектируем сами — платформа обкатывается на наших же проектах: промышленные объекты, АПК, сети. Готовы взять внешний объект в пилот.",
+    pilotBtn: "Запросить пилот",
+    pilotBtn2: "О компании →",
+    prodSheet: "Лист 02 / продукт",
+    prodTitle: "Платформа",
+    prodLead: "Сквозная информационная модель объекта в трёх состояниях.",
+    prodPoints: [
+      ["Проектирование", "Генерация графики по техническому заданию - Создание цифровой модели - нормоконтроль и экспертиза"],
+      ["Строительство", "Контроль параметров модели на строительной площадке. Автоматизация и исполнительной документации"],
+      ["Эксплуатация", "Система контроля параметров модели. Автоматизация и эксплуатационной документации"]
+    ],
+    prodHorizon: "Горизонт — вывод объекта на проектную мощность.",
+    prodSub: "Модель проекта → цифровой двойник → система контроля",
+    prodStagesTitle: "Стадии",
+    prodStackTitle: "Стек",
+    prodOutTitle: "На выходе",
+    servSheet: "Лист 03 / услуги",
+    servTitle: "Инженерные услуги",
+    servLead: "Полный цикл услуг проектирования с использованием искуственного интеллекта.",
+    compSheet: "Лист 04 / компания",
+    compTitle: "Проектное бюро, которое пишет свой софт",
+    compP1: "ТОО «Bek Stroy Invest» проектирует здания и сооружения в Казахстане: BIM, инженерные сети, объекты АПК, обследование и мониторинг. Лицензия ГСЛ №0788280, категория II.",
+    compP2: "Продуктовое направление выросло из собственной практики: инженеры и разработчики в одной команде, требования к платформе задают те же люди, которые сдают документацию на экспертизу.",
+    compWorkTitle: "Реализованные объекты",
+    compPartnersTitle: "Партнёры",
+    contSheet: "Лист 05 / контакты",
+    contTitle: "Пилот, партнёрство, инвестиции",
+    contLead: "Опишите задачу или запрос — ответим с составом работ и сроком.",
+    formName: "Имя",
+    formContact: "Телефон или e-mail",
+    formTask: "Задача",
+    formSend: "Отправить",
+    formNote: "Заявка уходит в WhatsApp на +7 (777) 957-61-63.",
+    formErrName: "Укажите имя.",
+    formErrContact: "Оставьте телефон или e-mail для ответа.",
+    formErrTask: "Опишите задачу — хотя бы пару строк.",
+    formOkKicker: "Заявка отправлена",
+    formOkTitle: "Мы получили запрос",
+    formOkLead: "Открылся WhatsApp с текстом заявки. Если окно не появилось — напишите на engpro.kz@gmail.com.",
+    formAgain: "Новая заявка",
+    footerNote: "Инжиниринг · ИИ · Астана",
+    stages: [
+      ["01", "Проектирование", "Цифровая модель проекта", "Создаётся цифровая модель проекта: параметризация по ТЗ, разделы ПСД средствами ИИ, автоматический нормоконтроль и экспертиза.", "Автоматизация нормоконтроля и экспертизы проекта"],
+      ["02", "Строительство", "Цифровой двойник", "Приборы контролируют параметры цифровой модели на площадке. Фактические значения расходятся с проектными — по измеренным данным формируется цифровой двойник.", "Телеметрии датчиков и сканирование дронов"],
+      ["03", "Эксплуатация", "Система контроля", "Приборы контролируют параметры цифрового двойника. Любое изменение отражается в системе контроля.", "Удалённый контроль технического состояния: мониторинг, обследование, обслуживание."],
+    ],
+    panels: [
+      ["01", "Стадия проектирования", "Выход стадии — цифровая модель проекта", [
+        ["Заказчик", "Исходные данные", "Заказчик загружает исходные данные для обработки.", ["Техническое задание", "АПЗ", "Технические условия"], []],
+        ["Проектировщик", "Цифровая модель проекта и ПСД", "Модель параметризуется по ТЗ средствами ИИ; разделы ПСД — её выход. Проектные параметры фиксируются как эталон.", ["Паспорт проекта", "ОПЗ", "РПЗ по разделам", "Чертежи по разделам", "Сметная документация", "Проект организации строительства"], ["ГП", "ТХ", "АР", "КМ", "КЖ", "ОВ", "ВК", "ЭОМ", "СС"]]
+      ]],
+      ["02", "Стадия строительства", "Выход стадии — цифровой двойник", [
+        ["Подрядчик", "Исполнительная документация", "Выпускается из цифрового двойника: состав работ и объёмы берутся из измеренных параметров.", ["Общий журнал работ", "Акты скрытых работ", "Исполнительные схемы", "Паспорта и сертификаты материалов", "Акты испытаний"], []],
+        ["Объект", "Приборный контроль параметров", "Приборы измеряют фактические параметры и сверяют их с проектными; расхождение формирует цифровой двойник.", ["Геодезический мониторинг", "Сканирование дронами", "Датчики бетона и температуры", "Контроль сетей и нагрузок", "Расхождение факт / проект"], []]
+      ]],
+      ["03", "Стадия эксплуатации", "Выход стадии — система контроля", [
+        ["Эксплуатирующая организация", "Эксплуатационные документы", "Цифровой двойник служит техническим паспортом объекта и базой регламентов.", ["Технический паспорт объекта", "Регламенты обслуживания", "Журнал дефектов", "План ППР"], []],
+        ["Объект", "Система контроля", "Датчики контролируют параметры двойника; каждое изменение отражается в системе контроля.", ["Мониторинг конструкций и сетей", "Обследование конструкций", "Учёт ресурсопотребления", "Журнал изменений параметров", "Планирование ремонтов"], []]
+      ]]
+    ],
+    smart: [
+      ["Проектирование", "Цифровая модель проекта", "Проектные параметры объекта. Эталон, с которым сверяются все последующие измерения."],
+      ["Строительство", "Цифровой двойник", "Параметры при строительстве изменяются. Приборный контроль на площадке даёт фактические значения — по ним формируется двойник возведённого объекта."],
+      ["Эксплуатация", "Система контроля", "Приборы контролируют параметры двойника; любое изменение отражается в системе контроля и доступно удалённо."]
+    ],
+    facts: [
+      ["BIM", "модель проекта"],
+      ["СН РК", "экспертиза ИИ"],
+      ["IoT", "цифровой двойник"],
+      ["ГСЛ №0788280", "лицензия, кат. II"]
+    ],
+    credentials: [
+      ["Организация", "ТОО «Bek Stroy Invest»"],
+      ["Лицензия", "ГСЛ №0788280 · кат. II"],
+      ["Нормы", "СН РК · СП РК · ГОСТ СПДС"],
+      ["Город", "Астана, Кенесары 8, оф. 1701"]
+    ],
+    stack: [
+      ["Модель", "Revit · IFC · открытые форматы BIM"],
+      ["Генерация", "LLM + собственные правила оформления"],
+      ["Экспертиза", "ИИ-проверка по СН РК, СП РК, ГОСТ СПДС"],
+      ["Данные объекта", "IoT-датчики, геодезия, сканирование дронами"],
+      ["Интеграции", "DWG · IFC · экспорт в комплект"]
+    ],
+    outputs: ["Паспорт проекта", "ОПЗ и РПЗ по разделам", "Чертежи по разделам", "Сметная документация", "Проект организации строительства", "Цифровая модель · DWG / IFC"],
+    services: [
+      ["01", "Проектирование", " Полный цикл проектной документации: от анализа исходных данных до выпуска разделов ПСД. Проектировщик использует ИИ для генерации разделов и нормоконтроля по СН РК и СП РК.", 
+      "One"],
+      ["02", "Техническое обследование строительных конструкций", "Определяем фактическое состояние несущих конструкций: инструментальные измерения, оценка прочности, дефектная ведомость, категория технического состояния.",
+      "Two"],
+      ["03", "Технический надзор", "Контроль соответствия работ проекту и нормам на всём сроке стройки: проверка исполнительной документации, скрытых работ, применяемых материалов.",
+      "Three"],
+      ["04", "Технический аудит объектов", "Независимая оценка объекта или проекта: комплектность и качество документации, соответствие смет физическим объёмам, реальный процент готовности.",
+      "Four"],
+      ["05", "Технический освидетельствование грузоподъёмных конструкций", "Периодическое и внеочередное освидетельствование краностроительных конструкций и грузоподъёмных механизмов: осмотр металлоконструкций и сварных соединений, проверка геометрии, статические и динамические испытания под нагрузкой.",
+      "Five"],
+
+    ],
+    portfolio: [
+      ["Промышленный объект", "Завод металлоконструкций", "https://engpro.kz/images/portfolio/zavod-metallokonstruktsiy.jpg"],
+      ["Промышленный объект", "Фармацевтическая фабрика", "https://engpro.kz/images/portfolio/farmatsevticheskaya-fabrika.jpg"],
+      ["Промышленный объект", "Фабрика утилизации отходов", "https://engpro.kz/images/portfolio/fabrika-utilizatsii-otkhodov.jpg"],
+      ["Снос", "Снос жилых домов, Алматы", "https://engpro.kz/images/portfolio/snos-zhilykh-domov-almaty.jpg"]
+    ],
+    contactRows: [
+      ["Организация", "ТОО «Bek Stroy Invest»"],
+      ["Телефон", "+7 (777) 957-61-63"],
+      ["E-mail", "engpro.kz@gmail.com"],
+      ["Адрес", "Астана, Кенесары 8, оф. 1701"],
+      ["Лицензия", "ГСЛ №0788280 · кат. II"]
+    ]
+  },
+  en: {
+    ctaShort: "PILOT",
+    nav: ["Home", "Product", "Services", "Company", "Contacts"],
+    heroSheet: "Sheet 01 / platform",
+    heroTitle: "The Intelligent Digital Model",
+    heroLead: "Bestech intelligent platform — design, construction, operation.",
+    modelLabel: "Axonometric · feed mill",
+    modelHint: "Scroll to rotate · drag to orbit",
+    heroBtn1: "How it works →",
+    heroBtn2: "Discuss a pilot",
+    dirSheet: "Directions",
+    dirTitle: "Bek Stroy Invest LLP",
+    directions: [
+      "Applying AI to issue the digital model and the design documentation",
+      "Project expert review with AI",
+      "Building digital twins with IoT connected on construction sites",
+      "Remote control of building condition at the operation stage"
+    ],
+    pipeSheet: "Chart / stages",
+    pipeTitle: "Three stages of an asset's life",
+    pipeLead: "Design — the project digital model. Construction — instrument control of its parameters and a digital twin from the measured data. Operation — a control system in which every change is reflected.",
+    smartSheet: "Smart construction",
+    smartTitle: "Project model, twin, control system",
+    smartLead: "Three states of one asset. Design parameters are set in the model, actual ones are measured by instruments on site, and changes in operation are reflected in the control system — divergence shows immediately, not in a report a month later.",
+    pilotTitle: "A pilot on a real asset",
+    pilotLead: "We design ourselves — the platform is run in on our own projects: industrial facilities, agriculture, utility networks. We are ready to take an external asset into a pilot.",
+    pilotBtn: "Request a pilot",
+    pilotBtn2: "About the company →",
+    prodSheet: "Sheet 02 / product",
+    prodTitle: "The platform",
+    prodLead: "An end-to-end information model of the asset in three states.",
+    prodPoints: [
+      ["Design", "Graphics generated from the brief - creation of the digital model - code checking and expert review"],
+      ["Construction", "Control of the model's parameters on the construction site. Automation and as-built documentation"],
+      ["Operation", "A control system over the model's parameters. Automation and operational documentation"]
+    ],
+    prodHorizon: "The horizon is bringing the asset to its design capacity.",
+    prodSub: "Project model → digital twin → control system",
+    prodStagesTitle: "Stages",
+    prodStackTitle: "Stack",
+    prodOutTitle: "Output",
+    servSheet: "Sheet 03 / services",
+    servTitle: "Engineering services",
+    servLead: "A full design cycle — the base the platform is built on and tested against.",
+    compSheet: "Sheet 04 / company",
+    compTitle: "A design office that writes its own software",
+    compP1: "Bek Stroy Invest LLP designs buildings and structures in Kazakhstan: BIM, utility networks, agricultural facilities, inspection and monitoring. State license GSL №0788280, Category II.",
+    compP2: "The product line grew out of our own practice: engineers and developers in one team, with the platform's requirements set by the same people who take documentation through expert review.",
+    compWorkTitle: "Completed facilities",
+    compPartnersTitle: "Partners",
+    contSheet: "Sheet 05 / contacts",
+    contTitle: "Pilot, partnership, investment",
+    contLead: "Describe the task or the request — we will answer with a scope and a timeline.",
+    formName: "Name",
+    formContact: "Phone or e-mail",
+    formTask: "Task",
+    formSend: "Send",
+    formNote: "The request is sent via WhatsApp to +7 (777) 957-61-63.",
+    formErrName: "Please give your name.",
+    formErrContact: "Leave a phone number or e-mail so we can reply.",
+    formErrTask: "Describe the task — a couple of lines is enough.",
+    formOkKicker: "Request sent",
+    formOkTitle: "We have your request",
+    formOkLead: "WhatsApp opened with the text of your request. If no window appeared, write to engpro.kz@gmail.com.",
+    formAgain: "New request",
+    footerNote: "Engineering · AI · Astana",
+    stages: [
+      ["01", "Design", "Project digital model", "The project digital model is created: parameterised to the brief, PSD sections generated with AI, code check and expert review automated.", "Automated code checking and project expert review"],
+      ["02", "Construction", "Digital twin", "Instruments control the digital model's parameters on site. Actual values diverge from design values — the digital twin is formed from the measured data.", "Sensor telemetry and drone scanning"],
+      ["03", "Operation", "Control system", "Instruments control the digital twin's parameters. Every change is reflected in the control system.", "Remote control of technical condition: monitoring, inspection, maintenance."],
+    ],
+    panels: [
+      ["01", "Design stage", "Output of the stage — the project digital model", [
+        ["Client", "Input data", "The client uploads the input data for processing.", ["Design brief", "Architectural planning assignment", "Utility conditions"], []],
+        ["Designer", "Project digital model and PSD", "The model is parameterised to the brief with AI; the PSD sections are its output. Design parameters are fixed as the reference.", ["Project passport", "General explanatory note", "Section explanatory notes", "Section drawings", "Cost documentation", "Construction organisation plan"], ["GP", "TH", "AR", "KM", "KZh", "OV", "VK", "EOM", "SS"]]
+      ]],
+      ["02", "Construction stage", "Output of the stage — the digital twin", [
+        ["Contractor", "As-built documentation", "Issued from the digital twin: scope and quantities are taken from the measured parameters.", ["General works log", "Hidden works certificates", "As-built drawings", "Material passports and certificates", "Test reports"], []],
+        ["Asset", "Instrument parameter control", "Instruments measure actual parameters and reconcile them with design values; the divergence forms the digital twin.", ["Geodetic monitoring", "Drone scanning", "Concrete and temperature sensors", "Network and load control", "Actual vs design divergence"], []]
+      ]],
+      ["03", "Operation stage", "Output of the stage — the control system", [
+        ["Operator", "Operational documents", "The digital twin serves as the asset's technical passport and the basis for its procedures.", ["Technical passport", "Maintenance procedures", "Defect log", "Planned maintenance schedule"], []],
+        ["Asset", "Control system", "Sensors control the twin's parameters; every change is reflected in the control system.", ["Structure and network monitoring", "Inspection of structures", "Resource metering", "Parameter change log", "Repair planning"], []]
+      ]]
+    ],
+    smart: [
+      ["Design", "Project digital model", "The asset's design parameters. The reference every later measurement is checked against."],
+      ["Construction", "Digital twin", "Parameters change during construction. Instrument control on site yields actual values — they form the twin of the asset as built."],
+      ["Operation", "Control system", "Instruments control the twin's parameters; every change is reflected in the control system and available remotely."]
+    ],
+    facts: [
+      ["BIM", "project model"],
+      ["SN RK", "AI expert review"],
+      ["IoT", "digital twin"],
+      ["GSL №0788280", "license, cat. II"]
+    ],
+    credentials: [
+      ["Organization", "Bek Stroy Invest LLP"],
+      ["License", "GSL №0788280 · Cat. II"],
+      ["Codes", "SN RK · SP RK · GOST SPDS"],
+      ["City", "Astana, Kenesary 8, off. 1701"]
+    ],
+    stack: [
+      ["Model", "Revit · IFC · open BIM formats"],
+      ["Generation", "LLM + the office's own drafting rules"],
+      ["Expert review", "AI check against SN RK, SP RK, GOST SPDS"],
+      ["Asset data", "IoT sensors, survey, drone scanning"],
+      ["Integrations", "DWG · IFC · export into the set"]
+    ],
+    outputs: ["Project passport", "General and section explanatory notes", "Section drawings", "Cost documentation", "Construction organisation plan", "Digital model · DWG / IFC"],
+    services: [
+      ["01", "Design", "The full cycle of design documentation: from analysis of the input data to the release of PSD sections. The designer uses AI to generate sections and to code-check them against SN RK and SP RK.",
+      "One"],
+      ["02", "Technical inspection of building structures", "We establish the actual condition of load-bearing structures: instrumental measurements, strength assessment, defect schedule, technical condition category.",
+      "Two"],
+      ["03", "Technical supervision", "Control of conformity of the works to the design and the codes throughout construction: verification of as-built documentation, hidden works and the materials used.",
+      "Three"],
+      ["04", "Technical audit of facilities", "An independent assessment of the asset or the project: completeness and quality of documentation, correspondence of cost estimates to physical quantities, the real percentage of completion.",
+      "Four"],
+      ["05", "Technical examination of lifting structures", "Periodic and extraordinary examination of crane structures and lifting equipment: inspection of steelwork and welded joints, geometry checks, static and dynamic load testing.",
+      "Five"],
+    ],
+    portfolio: [
+      ["Industrial facility", "Steel structures plant", "https://engpro.kz/images/portfolio/zavod-metallokonstruktsiy.jpg"],
+      ["Industrial facility", "Pharmaceutical factory", "https://engpro.kz/images/portfolio/farmatsevticheskaya-fabrika.jpg"],
+      ["Industrial facility", "Waste recycling plant", "https://engpro.kz/images/portfolio/fabrika-utilizatsii-otkhodov.jpg"],
+      ["Demolition", "Residential demolition, Almaty", "https://engpro.kz/images/portfolio/snos-zhilykh-domov-almaty.jpg"]
+    ],
+    contactRows: [
+      ["Organization", "Bek Stroy Invest LLP"],
+      ["Phone", "+7 (777) 957-61-63"],
+      ["E-mail", "engpro.kz@gmail.com"],
+      ["Address", "Astana, Kenesary 8, off. 1701"],
+      ["License", "GSL №0788280 · Cat. II"]
+    ]
+  }
+};
+
+const PARTNERS = ["Степногорский трубный завод", "ТД «Воронежсельмаш»", "ТОО «Аква Фактория»", "ТОО «Virgin Soil kz»", "АО «Стройконструкция»"];
+const PAGES = ["home", "product", "services", "company", "contacts"];
+class Message {
+    constructor(text, role) {
+        this.text = text;
+        this.role = role;
+        this.style = 
+          this.role === 'user'
+          ? 'ml-auto bg-blue-600 text-white'
+          : 'mr-auto bg-gray-100 text-black ';
+    }
+  }
+
+class Component extends DCLogic {
+
+ 
+
+  state = {chatMessageBuffer:"", chatMessages: [] ,page: "home", lang: null, form: { name: "", contact: "", task: "" }, error: "", sent: false, chatOpen: false };
+
+  get lang() { return this.state.lang || this.props.defaultLang || "ru"; }
+
+ 
+  componentDidMount() {
+    this._sync = () => {
+      const h = (location.hash || "").replace(/^#\/?/, "");
+      const [page, lang] = h.split("?");
+      const stored = (() => { try { return localStorage.getItem("bsi-lang"); } catch (e) { return null; } })();
+      const q = new URLSearchParams(lang || "");
+      const l = q.get("lang") || stored;
+      this.setState({
+        page: PAGES.includes(page) ? page : "home",
+        lang: l === "en" || l === "ru" ? l : this.state.lang
+      });
+    };
+    this._sync();
+    window.addEventListener("hashchange", this._sync);
+  }
+  componentWillUnmount() { window.removeEventListener("hashchange", this._sync); }
+
+  href(page, lang) {
+    const l = lang || this.lang;
+    return "#/" + (page === "home" ? "" : page) + (l === "ru" ? "" : "?lang=" + l);
+  }
+
+  set(page) {
+    location.hash = this.href(page);
+    this.setState({ page });
+    window.scrollTo(0, 0);
+  }
+
+  setLang(l) {
+    try { localStorage.setItem("bsi-lang", l); } catch (e) {}
+    this.setState({ lang: l, error: "" });
+    location.hash = this.href(this.state.page, l);
+  }
+
+  field(e) {
+    const { name, value } = e.target;
+    this.setState(s => ({ form: Object.assign({}, s.form, { [name]: value }), error: "" }));
+  }
+
+  handleUserField(e) {
+    const {name, value} = e.target;
+    this.setState({chatMessageBuffer: value});
+
+  }
+
+  submit(e) {
+    e.preventDefault();
+    const t = T[this.lang];
+    const { name, contact, task } = this.state.form;
+    const err = !name.trim() ? t.formErrName : !contact.trim() ? t.formErrContact : task.trim().length < 8 ? t.formErrTask : "";
+    if (err) { this.setState({ error: err }); return; }
+    const body = [t.formName + ": " + name, t.formContact + ": " + contact, t.formTask + ": " + task].join("\n");
+    window.open("https://wa.me/77779576163?text=" + encodeURIComponent(body), "_blank", "noopener");
+    this.setState({ sent: true, error: "" });
+  }
+
+  toggleChat() {
+    this.setState({
+      chatOpen: !this.state.chatOpen
+    });
+  }
+
+  async sendMessage(){
+
+    const m = new Message(this.state.chatMessageBuffer, "user");
+
+    this.setState(s => ({ chatMessages: [...s.chatMessages, m] }));
+    let text=""
+    try{
+      const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: "llama3", // или ваша модель
+        messages: [
+          { role: "user", content: this.state.chatMessageBuffer }
+        ],
+        stream: false // отключаем стриминг для простоты с моком
+      })
+    });
+    if (!response.ok) {
+      throw new Error(`Ошибка сервера: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log(data.response);
+    this.text = data.response;
+  
+  } catch (e){
+        console.log(e)
+      this.text = ' Error'
+    }
+    const res = new Message(this.text, "assistent"); 
+    this.setState(s => ({ chatMessages: [...s.chatMessages, res] }));
+    console.log(this.state.chatMessages);
+  }
+
+ 
+  renderVals() {
+    const lang = this.lang;
+    const t = T[lang];
+
+   
+    return {
+      t,
+      chatMessages: this.state.chatMessages,
+      chatOpen: this.state.chatOpen,
+      toggleChat: () => this.toggleChat(),
+      sendMessage: () => this.sendMessage(),
+      userMessage: this.state.chatMessageBuffer,
+      handleUserField: (e) => this.handleUserField(e),
+      navItems: PAGES.map((id, i) => ({ id, num: "0" + (i + 1), label: t.nav[i], href: this.href(id), active: this.state.page === id })),
+      goHome: () => this.set("home"),
+      goProduct: () => this.set("product"),
+      goCompany: () => this.set("company"),
+      goContacts: () => this.set("contacts"),
+      toggleLang: () => this.setLang(lang === "ru" ? "en" : "ru"),
+      onField: (e) => this.field(e),
+      formSubmit: (e) => this.submit(e),
+      formReset: () => this.setState({ sent: false, form: { name: "", contact: "", task: "" }, error: "" }),
+      fName: this.state.form.name,
+      fContact: this.state.form.contact,
+      fTask: this.state.form.task,
+      formError: this.state.error,
+      formSent: this.state.sent,
+      formOpen: !this.state.sent,
+      otherLang: lang === "ru" ? "EN" : "RU",
+      isHome: this.state.page === "home",
+      isProduct: this.state.page === "product",
+      isServices: this.state.page === "services",
+      isCompany: this.state.page === "company",
+      isContacts: this.state.page === "contacts",
+      stages: t.stages.map((p, i) => ({ num: p[0], title: p[1], tag: p[2], desc: p[3], long: p[4], arrow: i < t.stages.length - 1 })),
+      directions: t.directions.map((v, i) => ({ n: "0" + (i + 1), v })),
+      stagePanels: t.panels.map(p => ({
+        num: p[0], title: p[1], note: p[2],
+        cols: p[3].map(c => ({ role: c[0], title: c[1], lead: c[2], items: c[3].map((v, i) => ({ n: "0" + (i + 1), v })), codes: c[4] }))
+      })),
+      smart: t.smart.map(s => ({ num: s[0], title: s[1], desc: s[2] })),
+      facts: (this.props.showFacts ?? true) ? t.facts.map(f => ({ big: f[0], label: f[1] })) : [],
+      credentials: t.credentials.map(c => ({ k: c[0], v: c[1] })),
+      stack: t.stack.map(s => ({ k: s[0], v: s[1] })),
+      outputs: t.outputs,
+      prodPoints: t.prodPoints.map((p, i) => ({ n: "0" + (i + 1), k: p[0], v: p[1] })),
+      services: t.services.map(s => ({ num: s[0], title: s[1], desc: s[2], flush: s[3] })),
+      w0: { kind: t.portfolio[0][0], title: t.portfolio[0][1] },
+      w1: { kind: t.portfolio[1][0], title: t.portfolio[1][1] },
+      w2: { kind: t.portfolio[2][0], title: t.portfolio[2][1] },
+      w3: { kind: t.portfolio[3][0], title: t.portfolio[3][1] },
+      partners: PARTNERS,
+      contactRows: t.contactRows.map(c => ({ k: c[0], v: c[1] })),
+
+
+
+
+    };
+  }
+}
+
+</script>
+
+</body>
+</html>

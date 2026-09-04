@@ -1,0 +1,19 @@
+{
+  "name": "bsi-platform-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Сайт ТОО «Bek Stroy Invest» — ИИ для выпуска цифровой модели и проектной документации",
+  "main": "BSI Platform.dc.html",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "serve": "node server.js 8080",
+    "build": "node build.js",
+    "preview": "node server.js 8001 dist"
+  },
+  "keywords": ["bim", "iot", "digital-twin", "ai", "construction", "astana"],
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  }
+}
