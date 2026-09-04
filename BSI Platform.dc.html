@@ -50,6 +50,7 @@
     <button type="button" onClick="{{ goContacts }}" class="btn btn-primary blueprint" style="letter-spacing: .1em">{{ t.ctaShort }}<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></button>
   </div>
 
+  <!-- ===== ЧАТ ОТКЛЮЧЁН =====
   <button 
     onClick="{{ toggleChat }}" 
     class="fixed right-4 bottom-4 w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center text-xl z-50 hover:bg-blue-700 transition cursor-pointer"
@@ -64,7 +65,6 @@
         <button onClick="{{ toggleChat }}" class="text-gray-400 hover:text-black">✕</button>
       </div>
 
-      <!-- <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm flex flex-col"></div> -->
       <sc-for list="{{ chatMessages }}" as="m">
           <div class="{{ m.style}} rounded-xl p-3 max-w-[85%]"> {{m.text}} </div>
       </sc-for>
@@ -78,7 +78,6 @@
           value="{{ userMessage }}"
           onChange="{{handleUserField}}"
           >
-          <!-- <input id="bsi-name" name="name" class="input" type="text" autocomplete="name" value="{{ fName }}" onChange="{{ onField }}" style="width: 100%"> -->
 
         <button onClick="{{ sendMessage }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
           ➤
@@ -86,10 +85,7 @@
       </div>
     </aside>
   </sc-if>
-
-  <!-- <sc-if value="{{ chatOpen }}">
-  
-  </sc-if> -->
+  ===== /ЧАТ ОТКЛЮЧЁН ===== -->
   
 
   <!-- ═══ HOME ═══ -->
