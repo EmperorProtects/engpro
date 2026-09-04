@@ -64,7 +64,7 @@
         <button onClick="{{ toggleChat }}" class="text-gray-400 hover:text-black">✕</button>
       </div>
 
-      <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm flex flex-col"></div>
+      <!-- <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm flex flex-col"></div> -->
       <sc-for list="{{ chatMessages }}" as="m">
           <div class="{{ m.style}} rounded-xl p-3 max-w-[85%]"> {{m.text}} </div>
       </sc-for>
