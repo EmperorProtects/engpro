@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="_ds/industry-a458f529-fc3f-4d39-8047-7968176c36b5/styles.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script src="_ds/industry-a458f529-fc3f-4d39-8047-7968176c36b5/_ds_bundle.js"></script>
+<script src="./param-model.js"></script>
 
 <style>
   html, body { background: #f2f2f3; }
@@ -50,9 +51,8 @@
     <button type="button" onClick="{{ goContacts }}" class="btn btn-primary blueprint" style="letter-spacing: .1em">{{ t.ctaShort }}<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></button>
   </div>
 
-  <!-- ===== ЧАТ ОТКЛЮЧЁН =====
-  <button 
-    onClick="{{ toggleChat }}" 
+  <button
+    onClick="{{ toggleChat }}"
     class="fixed right-4 bottom-4 w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center text-xl z-50 hover:bg-blue-700 transition cursor-pointer"
   >
     💬
@@ -60,33 +60,76 @@
 
   <sc-if value = "{{ chatOpen }}">
     <aside id="chat-window" class="fixed right-4 bottom-20 w-96 h-[550px] bg-white border shadow-2xl rounded-2xl flex flex-col z-50 ">
-      <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-        <span class="font-semibold text-gray-800">AI Assistant</span>
+      <div class="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-2xl">
+        <span class="font-semibold text-gray-800">AI Assistant (Ollama)</span>
         <button onClick="{{ toggleChat }}" class="text-gray-400 hover:text-black">✕</button>
       </div>
 
-      <sc-for list="{{ chatMessages }}" as="m">
-          <div class="{{ m.style}} rounded-xl p-3 max-w-[85%]"> {{m.text}} </div>
-      </sc-for>
-      <div class="p-4 border-t bg-white flex gap-2">
-        <input 
-          id="chat-input" 
-          name = "message"
+      <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+        <sc-for list="{{ chatMessages }}" as="m">
+          <div class="{{ m.style }} rounded-xl p-3 max-w-[85%] whitespace-pre-wrap">{{ m.text }}</div>
+          <sc-for list="{{ m.files }}" as="f">
+            <a href="{{ f.href }}" download="{{ f.name }}" class="{{ m.style }} rounded-xl px-3 py-1.5 max-w-[85%] text-xs underline">⬇ {{ f.name }}</a>
+          </sc-for>
+          <sc-if value="{{ m.downloadHref }}">
+            <a href="{{ m.downloadHref }}" download="{{ m.downloadName }}" class="mr-auto text-xs text-gray-400 hover:text-gray-700 underline -mt-1">⬇ скачать ответ (.txt)</a>
+          </sc-if>
+          <sc-if value="{{ m.model3d }}">
+            <div class="mr-auto w-full max-w-[85%] border rounded-lg overflow-hidden">
+              <param-model
+                width="{{ m.model3d.width }}"
+                depth="{{ m.model3d.depth }}"
+                height="{{ m.model3d.height }}"
+                floors="{{ m.model3d.floors }}"
+                roof="{{ m.model3d.roof }}"
+                style="display: block; width: 100%; height: 200px; --model-line: #416180; --model-face: #5980a6"
+              ></param-model>
+            </div>
+          </sc-if>
+        </sc-for>
+        <sc-if value="{{ chatSending }}">
+          <div class="mr-auto bg-gray-100 text-black rounded-xl p-3 max-w-[85%]">…</div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ chatAttachmentName }}">
+        <div class="px-4 pt-2 flex items-center gap-2 text-xs text-gray-600 border-t bg-white">
+          <span class="truncate">📎 {{ chatAttachmentName }}</span>
+          <button type="button" onClick="{{ removeAttachment }}" class="text-gray-400 hover:text-black">✕</button>
+        </div>
+      </sc-if>
+
+      <div class="px-4 pt-2 text-[11px] text-gray-400 border-t bg-white">Опишите объект в поле ниже — 🧮 посчитает смету, 🏗 построит черновую 3D-модель</div>
+      <div class="p-4 pt-2 bg-white flex gap-2">
+        <input type="file" id="chat-file-input" style="display: none" onChange="{{ handleChatFile }}" accept="image/*,.txt,.md,.csv,.json,.log,.js,.ts,.py,.html,.css,.yaml,.yml">
+        <button type="button" onClick="{{ triggerFilePicker }}" disabled="{{ chatSending }}" title="Прикрепить файл" class="border rounded-lg px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50">
+          📎
+        </button>
+        <button type="button" onClick="{{ requestEstimate }}" disabled="{{ chatSending }}" title="Посчитать смету по описанию" class="border rounded-lg px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50">
+          🧮
+        </button>
+        <button type="button" onClick="{{ requestModel3d }}" disabled="{{ chatSending }}" title="Построить 3D-модель по описанию" class="border rounded-lg px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50">
+          🏗
+        </button>
+        <input
+          id="chat-input"
+          name="message"
           class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          type="text" 
-          placeholder="Сообщение..." 
+          type="text"
+          placeholder="Сообщение..."
           value="{{ userMessage }}"
-          onChange="{{handleUserField}}"
+          onChange="{{ handleUserField }}"
+          onKeyDown="{{ handleChatKeyDown }}"
+          disabled="{{ chatSending }}"
           >
 
-        <button onClick="{{ sendMessage }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
+        <button onClick="{{ sendMessage }}" disabled="{{ chatSending }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition disabled:opacity-50">
           ➤
         </button>
       </div>
     </aside>
   </sc-if>
-  ===== /ЧАТ ОТКЛЮЧЁН ===== -->
-  
+
 
   <!-- ═══ HOME ═══ -->
   <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
@@ -736,22 +779,73 @@ const T = {
 
 const PARTNERS = ["Степногорский трубный завод", "ТД «Воронежсельмаш»", "ТОО «Аква Фактория»", "ТОО «Virgin Soil kz»", "АО «Стройконструкция»"];
 const PAGES = ["home", "product", "services", "company", "contacts"];
+const FILE_EXT_BY_LANG = {
+  javascript: 'js', typescript: 'ts', python: 'py', json: 'json', csv: 'csv',
+  markdown: 'md', bash: 'sh', shell: 'sh', sh: 'sh', html: 'html', css: 'css',
+  yaml: 'yml', yml: 'yml', sql: 'sql', xml: 'xml'
+};
+
+function extractCodeFiles(text) {
+  const files = [];
+  const re = /```(\w+)?\n([\s\S]*?)```/g;
+  let match, i = 0;
+  while ((match = re.exec(text))) {
+    i++;
+    const lang = (match[1] || '').toLowerCase();
+    const ext = FILE_EXT_BY_LANG[lang] || (/^[a-z0-9]{1,6}$/.test(lang) ? lang : 'txt');
+    files.push({
+      name: 'attachment-' + i + '.' + ext,
+      href: 'data:text/plain;charset=utf-8,' + encodeURIComponent(match[2])
+    });
+  }
+  return files;
+}
+
 class Message {
-    constructor(text, role) {
+    constructor(text, role, extra) {
         this.text = text;
         this.role = role;
-        this.style = 
+        this.style =
           this.role === 'user'
           ? 'ml-auto bg-blue-600 text-white'
           : 'mr-auto bg-gray-100 text-black ';
+        this.files = role === 'user' ? [] : extractCodeFiles(text);
+        this.downloadHref = role === 'user' || !text ? null : 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+        this.downloadName = 'reply-' + Date.now() + '.txt';
+        this.model3d = (extra && extra.model3d) || null;
     }
   }
+
+function formatEstimate(data) {
+  const p = data.params || {};
+  const lines = [
+    'ДЕМО-РАСЧЁТ (расценки условные, см. ESTIMATE_RATES в server.js):',
+    `Объект: ${p.buildingType}, ${p.areaM2} м², этажей: ${p.floors}, материал: ${p.material}, отделка: ${p.finishing}, регион: ${p.region}`,
+    '',
+    ...data.rows.map(r => `${r.name}: ${r.amount.toLocaleString('ru-RU')} ${data.currency}`),
+    '',
+    `ИТОГО: ${data.total.toLocaleString('ru-RU')} ${data.currency}`,
+    data.note ? '\n⚠ ' + data.note : ''
+  ].filter((l) => l !== '');
+  const csv = [
+    'Статья,Сумма,Валюта',
+    ...data.rows.map(r => `${r.name},${r.amount},${data.currency}`),
+    `ИТОГО,${data.total},${data.currency}`
+  ].join('\n');
+  return lines.join('\n') + '\n\n```csv\n' + csv + '\n```';
+}
 
 class Component extends DCLogic {
 
  
 
-  state = {chatMessageBuffer:"", chatMessages: [] ,page: "home", lang: null, form: { name: "", contact: "", task: "" }, error: "", sent: false, chatOpen: false };
+  state = {
+    chatMessageBuffer: "",
+    chatMessages: [new Message("Привет! Чем могу помочь?", "assistant")],
+    chatSending: false,
+    chatAttachment: null,
+    page: "home", lang: null, form: { name: "", contact: "", task: "" }, error: "", sent: false, chatOpen: false
+  };
 
   get lang() { return this.state.lang || this.props.defaultLang || "ru"; }
 
@@ -818,43 +912,157 @@ class Component extends DCLogic {
     });
   }
 
-  async sendMessage(){
-
-    const m = new Message(this.state.chatMessageBuffer, "user");
-
-    this.setState(s => ({ chatMessages: [...s.chatMessages, m] }));
-    let text=""
-    try{
-      const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: "llama3", // или ваша модель
-        messages: [
-          { role: "user", content: this.state.chatMessageBuffer }
-        ],
-        stream: false // отключаем стриминг для простоты с моком
-      })
-    });
-    if (!response.ok) {
-      throw new Error(`Ошибка сервера: ${response.status}`);
+  handleChatKeyDown(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      this.sendMessage();
     }
-    const data = await response.json();
-    console.log(data.response);
-    this.text = data.response;
-  
-  } catch (e){
-        console.log(e)
-      this.text = ' Error'
-    }
-    const res = new Message(this.text, "assistent"); 
-    this.setState(s => ({ chatMessages: [...s.chatMessages, res] }));
-    console.log(this.state.chatMessages);
   }
 
- 
+  triggerFilePicker() {
+    const el = document.getElementById("chat-file-input");
+    if (el) el.click();
+  }
+
+  removeAttachment() {
+    const el = document.getElementById("chat-file-input");
+    if (el) el.value = "";
+    this.setState({ chatAttachment: null });
+  }
+
+  handleChatFile(e) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+
+    const isImage = /^image\//.test(file.type);
+    const isText = /^text\//.test(file.type) || /\.(txt|md|csv|json|log|js|ts|py|html|css|xml|ya?ml)$/i.test(file.name);
+    const info = (t) => this.setState(s => ({ chatMessages: [...s.chatMessages, new Message(t, "assistant")] }));
+
+    if (!isImage && !isText) {
+      info('Файл "' + file.name + '" не поддерживается. Можно прикреплять изображения и текстовые файлы (.txt, .md, .csv, .json, .py, .js, .html, .css…).');
+      return;
+    }
+    const maxSize = isImage ? 4 * 1024 * 1024 : 300 * 1024;
+    if (file.size > maxSize) {
+      info('Файл "' + file.name + '" слишком большой (максимум ' + Math.round(maxSize / 1024) + ' КБ).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => info('Не удалось прочитать файл "' + file.name + '".');
+    reader.onload = () => {
+      if (isImage) {
+        const base64 = String(reader.result).split(",")[1] || "";
+        this.setState({ chatAttachment: { name: file.name, kind: "image", data: base64 } });
+      } else {
+        this.setState({ chatAttachment: { name: file.name, kind: "text", data: String(reader.result).slice(0, 8000) } });
+      }
+    };
+    if (isImage) reader.readAsDataURL(file); else reader.readAsText(file);
+  }
+
+  async sendMessage(){
+    const text = this.state.chatMessageBuffer.trim();
+    const attachment = this.state.chatAttachment;
+    if ((!text && !attachment) || this.state.chatSending) return;
+
+    const history = this.state.chatMessages.map(m => ({
+      role: m.role === "user" ? "user" : "assistant",
+      content: m.text
+    }));
+
+    const displayText = [text, attachment ? "📎 " + attachment.name : ""].filter(Boolean).join("\n");
+    const m = new Message(displayText, "user");
+    this.setState(s => ({ chatMessages: [...s.chatMessages, m], chatMessageBuffer: "", chatAttachment: null, chatSending: true }));
+
+    const ollamaMessage = { role: "user", content: text };
+    let model = "llama3";
+    if (attachment?.kind === "text") {
+      ollamaMessage.content = 'Файл "' + attachment.name + '":\n\n' + attachment.data + (text ? ("\n\n" + text) : "");
+    } else if (attachment?.kind === "image") {
+      ollamaMessage.images = [attachment.data];
+      ollamaMessage.content = text || "Опиши это изображение.";
+      model = "llava"; // мультимодальная модель — должна быть загружена: ollama pull llava
+    }
+
+    let reply;
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages: [...history, ollamaMessage],
+          stream: false
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || `Ошибка сервера: ${response.status}`);
+      reply = data.message?.content || "Пустой ответ от модели";
+    } catch (e) {
+      console.error(e);
+      reply = "Не удалось связаться с Ollama: " + e.message;
+    }
+
+    const res = new Message(reply, "assistant");
+    this.setState(s => ({ chatMessages: [...s.chatMessages, res], chatSending: false }));
+  }
+
+  async requestEstimate() {
+    const text = this.state.chatMessageBuffer.trim();
+    if (!text || this.state.chatSending) return;
+    const m = new Message(text, "user");
+    this.setState(s => ({ chatMessages: [...s.chatMessages, m], chatMessageBuffer: "", chatSending: true }));
+
+    let reply;
+    try {
+      const response = await fetch('/api/estimate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: text })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || `Ошибка сервера: ${response.status}`);
+      reply = formatEstimate(data);
+    } catch (e) {
+      console.error(e);
+      reply = "Не удалось рассчитать смету: " + e.message;
+    }
+    const res = new Message(reply, "assistant");
+    this.setState(s => ({ chatMessages: [...s.chatMessages, res], chatSending: false }));
+  }
+
+  async requestModel3d() {
+    const text = this.state.chatMessageBuffer.trim();
+    if (!text || this.state.chatSending) return;
+    const m = new Message(text, "user");
+    this.setState(s => ({ chatMessages: [...s.chatMessages, m], chatMessageBuffer: "", chatSending: true }));
+
+    let res;
+    try {
+      const response = await fetch('/api/model3d', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: text })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || `Ошибка сервера: ${response.status}`);
+      const p = data.params;
+      const summary = [
+        'Черновая 3D-модель по описанию (упрощённый параметрический вайрфрейм, не точная геометрия):',
+        `${p.buildingType}, ${p.width}×${p.depth} м, высота этажа ${p.height} м, этажей: ${p.floors}, крыша: ${p.roof === 'flat' ? 'плоская' : 'двускатная'}`,
+        data.note ? '⚠ ' + data.note : ''
+      ].filter(Boolean).join('\n');
+      res = new Message(summary, "assistant", { model3d: p });
+    } catch (e) {
+      console.error(e);
+      res = new Message("Не удалось построить модель: " + e.message, "assistant");
+    }
+    this.setState(s => ({ chatMessages: [...s.chatMessages, res], chatSending: false }));
+  }
+
+
   renderVals() {
     const lang = this.lang;
     const t = T[lang];
@@ -864,10 +1072,18 @@ class Component extends DCLogic {
       t,
       chatMessages: this.state.chatMessages,
       chatOpen: this.state.chatOpen,
+      chatSending: this.state.chatSending,
+      chatAttachmentName: this.state.chatAttachment?.name || "",
       toggleChat: () => this.toggleChat(),
       sendMessage: () => this.sendMessage(),
       userMessage: this.state.chatMessageBuffer,
       handleUserField: (e) => this.handleUserField(e),
+      handleChatKeyDown: (e) => this.handleChatKeyDown(e),
+      handleChatFile: (e) => this.handleChatFile(e),
+      triggerFilePicker: () => this.triggerFilePicker(),
+      removeAttachment: () => this.removeAttachment(),
+      requestEstimate: () => this.requestEstimate(),
+      requestModel3d: () => this.requestModel3d(),
       navItems: PAGES.map((id, i) => ({ id, num: "0" + (i + 1), label: t.nav[i], href: this.href(id), active: this.state.page === id })),
       goHome: () => this.set("home"),
       goProduct: () => this.set("product"),
